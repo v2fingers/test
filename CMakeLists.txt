@@ -1,36 +1,43 @@
 cmake_minimum_required(VERSION 3.20)
-project(Engine)
+project(VkTests LANGUAGES C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
+
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_compile_options(-O0 -g -DDEBUG )
+  add_compile_options(-O0 -g -DDEBUG -Wall -Wextra)
 else()
   add_compile_options(-O3 -march=native -flto)
   add_link_options(-flto)
 endif()
 
-file(GLOB_RECURSE RUNTIME_SRC CONFIGURE_DEPENDS
-  runtime/src/*.c
-  runtime/vendor/*.c
+include_directories(
+  src
+  vendor
+)
+
+set_source_files_properties(vendor/vma/vma.cpp
+  PROPERTIES COMPILE_OPTIONS "-Wno-nullability-completeness"
 )
 
 file(GLOB_RECURSE TESTBED_SRC CONFIGURE_DEPENDS
-  testbed/src/*.c
+  src/*.c
 )
 
-add_library(Runtime STATIC ${RUNTIME_SRC})
-add_executable(testbed ${TESTBED_SRC})
-
-include_directories( Runtime
-  runtime/src
-  runtime/vendor
+add_executable(vktest
+  ${TESTBED_SRC}
+  vendor/vma/vma.cpp
 )
 
-target_link_libraries(testbed PRIVATE
-  Runtime
+target_link_libraries(vktest PRIVATE
   vulkan
   glfw
 )
