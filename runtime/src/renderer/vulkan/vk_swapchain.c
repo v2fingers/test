@@ -1,6 +1,7 @@
 #include "vk_swapchain.h"
 #include "core/logger.h"
 #include "core/memory.h"
+#include "renderer/vulkan/vk_image.h"
 #include "vk_utils.h"
 
 void vk_swapchain_create(VulkanDevice* device, u32 width, u32 height, VkSurfaceKHR surface, VulkanSwapchain* out_swapchain) {
@@ -72,4 +73,5 @@ void vk_swapchain_destroy(VulkanDevice* device, VulkanSwapchain* swapchain) {
 	}
 	mem_free(swapchain->images, swapchain->n_images * sizeof(VkImage));
 	mem_free(swapchain->image_views, swapchain->n_images * sizeof(VkImageView));
+	vk_image_destroy(device, &swapchain->depth_image);
 }

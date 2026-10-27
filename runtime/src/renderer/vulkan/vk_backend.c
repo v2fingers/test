@@ -2,6 +2,7 @@
 #include "core/logger.h"
 #include "core/memory.h"
 
+#include "renderer/vulkan/data.h"
 #include "vk_device.h"
 #include "vk_instance.h"
 #include "vk_swapchain.h"
@@ -11,6 +12,7 @@ typedef struct internal_state {
 	VulkanDevice device;
 	VkSurfaceKHR surface;
 	VulkanSwapchain swapchain;
+	MeshData mesh;
 } InternalState;
 
 b8 vulkan_backend_init(Window* window, BackendState* back_state) {
@@ -26,6 +28,7 @@ b8 vulkan_backend_init(Window* window, BackendState* back_state) {
 	win_get_framebuffer_size(window, &width, &height);
 	vk_swapchain_create(&state->device, width, height, state->surface, &state->swapchain);
 
+	load_mesh_data("runtime/assets/mesh/suzanne.obj", &state->mesh);
 	return TRUE;
 }
 
@@ -34,6 +37,7 @@ void vulkan_backend_shutdown(BackendState* back_state) {
 	InternalState* state = (InternalState*)back_state->internal_state;
 	vkDeviceWaitIdle(state->device.logical_dev);
 
+	destroy_mesh_data(&state->mesh);
 	vk_swapchain_destroy(&state->device, &state->swapchain);
 	vk_device_destroy(&state->device);
 	vk_instance_destroy(&state->instance);

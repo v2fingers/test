@@ -38,7 +38,7 @@ void vk_image_create(
 	vkGetImageMemoryRequirements(device->logical_dev, out_image->handle, &memory_requirements);
 
 	i32 memory_type = find_memory_index(device, memory_requirements.memoryTypeBits, memory_flags);
-	VASSERT_MSG(memory_type == -1, "Required memory type not found, Image not valid");
+	VASSERT_MSG(memory_type != -1, "Required memory type not found, Image not valid");
 
 	VkMemoryAllocateInfo memory_allocate_info = {
 		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
